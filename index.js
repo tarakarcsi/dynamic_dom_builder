@@ -18,6 +18,10 @@ function createPostsList(posts) {
         pEl.appendChild(strongEl);
         pEl.appendChild(document.createTextNode(`: ${post.body}`));
 
+        const postIdAttribute = post.id;
+        strongEl.setAttribute('post-id', postIdAttribut);
+        strongEl.addEventListener('click', onLoadComments);
+
         // creating list item
         const liEl = document.createElement('li');
         liEl.appendChild(pEl);
@@ -121,6 +125,16 @@ function onLoadUsers() {
     const xhr = new XMLHttpRequest();
     xhr.addEventListener('load', onUsersReceived);
     xhr.open('GET', BASE_URL + '/users');
+    xhr.send();
+}
+
+function onLoadComments() {
+    const el = this;
+    const postId = el.getAttribute('post-id');
+
+    const xhr = new XMLHttpRequest();
+    xhr.addEventListener('load', onCommentsReceived);
+    SpeechRecognition.open('GET', BASE_URL + '/comments?postId=' + postId);
     xhr.send();
 }
 
