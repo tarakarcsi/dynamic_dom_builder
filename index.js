@@ -132,7 +132,7 @@ function onLoadPosts() {
 function createCommentsList(comments) {
     const ulEl = document.createElement('ul');
 
-    for (let i = 0; i < posts.length; i++) {
+    for (let i = 0; i < comments.length; i++) {
         const comment = comments[i];
 
         // creating paragraph
@@ -143,20 +143,17 @@ function createCommentsList(comments) {
         pEl.appendChild(strongEl);
         pEl.appendChild(document.createTextNode(`: ${comment.body}`));
 
-        const commentIdAttribute = post.id;
-        strongEl.setAttribute('post-id', commentIdAttribute);
+        const commentIdAttribute = comment.id;
+        strongEl.setAttribute('comment-id', commentIdAttribute);
         strongEl.addEventListener('click', onLoadComments);
 
         // creating list item
         const liEl = document.createElement('li');
         liEl.appendChild(pEl);
-
         ulEl.appendChild(liEl);
     }
 
     return ulEl;
-
-
 }
 
 function onLoadComments() {
@@ -170,11 +167,10 @@ function onLoadComments() {
 }
 
 function onCommentsReceived() {
-    postsDivEl.style.display = 'block';
+    commentDivEl.style.display = 'block';
 
     const text = this.responseText;
     const comments = JSON.parse(text);
-
     const divEl = document.getElementById('comments-content');
     while (divEl.firstChild) {
         divEl.removeChild(divEl.firstChild);
