@@ -19,7 +19,7 @@ function createPostsList(posts) {
         pEl.appendChild(document.createTextNode(`: ${post.body}`));
 
         const postIdAttribute = post.id;
-        strongEl.setAttribute('post-id', postIdAttribut);
+        strongEl.setAttribute('post-id', postIdAttribute);
         strongEl.addEventListener('click', onLoadComments);
 
         // creating list item
@@ -134,8 +134,12 @@ function onLoadComments() {
 
     const xhr = new XMLHttpRequest();
     xhr.addEventListener('load', onCommentsReceived);
-    SpeechRecognition.open('GET', BASE_URL + '/comments?postId=' + postId);
+    xhr.open('GET', BASE_URL + '/comments?postId=' + postId);
     xhr.send();
+}
+
+function onCommentsReceived() {
+    
 }
 
 document.addEventListener('DOMContentLoaded', (event) => {
