@@ -4,6 +4,8 @@ let usersDivEl;
 let postsDivEl;
 let commentDivEl;
 let loadButtonEl;
+let albumDivEl;
+let loadAlbumsButtonDivel;
 
 function createUsersTableHeader() {
     const idTdEl = document.createElement('td');
@@ -178,11 +180,88 @@ function onCommentsReceived() {
     divEl.appendChild(createCommentsList(comments));
 }
 
+function createAlbumsTableHeader() {
+    const idTdEl = document.createElement('td');
+    idTdEl.textContent = 'Id';
+
+    const nameTdEl = document.createElement('td');
+    nameTdEl.textContent = 'Name';
+
+    const trEl = document.createElement('tr');
+    trEl.appendChild(idTdEl);
+    trEl.appendChild(nameTdEl);
+
+    const theadEl = document.createElement('thead');
+    theadEl.appendChild(trEl);
+    return theadEl;
+}
+
+function createAlbumsTableBody(albums) {
+    const tbodyEl = document.createElement('tbody');
+
+    for (let i = 0; i < albums.length; i++) {
+        const album = albums[i];
+
+        // creating id cell
+        const idTdEl = document.createElement('td');
+        idTdEl.textContent = album.id;
+
+        // creating name cell
+        const dataAlbumIdAttr = document.createAttribute('data-album-id');
+        dataAlbumIdAttr.value = album.id;
+
+        const buttonEl = document.createElement('button');
+        buttonEl.textContent = album.title;
+        buttonEl.setAttributeNode(dataAlbumIdAttr);
+        buttonEl.addEventListener('click', onLoadAlbums);
+
+        const nameTdEl = document.createElement('td');
+        nameTdEl.appendChild(buttonEl);
+
+        // creating row
+        const trEl = document.createElement('tr');
+        trEl.appendChild(idTdEl);
+        trEl.appendChild(nameTdEl);
+
+        tbodyEl.appendChild(trEl);
+    }
+
+    return tbodyEl;
+}
+
+function createAlbumsTable(albums) {
+    const tableEl = document.createElement('table');
+    tableEl.appendChild(createAlbumsTableHeader());
+    tableEl.appendChild(createAlbumsTableBody(albums));
+    return tableEl;
+}
+
+function onAlbumsReceived() {
+    albumDivEl.style.display = 'block';
+
+    loadButtonEl.remove();
+
+    const text = this.responseText;
+    const albums = JSON.parse(text);
+
+    const divEl = document.getElementById('albums-content');
+    divEl.appendChild(createAlbumsTable(albums));
+}
+
+function onLoadAlbums() {
+    const xhr = new XMLHttpRequest();
+    xhr.addEventListener('load', onAlbumsReceived);
+    xhr.open('GET', BASE_URL + '/albums');
+    xhr.send();
+}
+
 document.addEventListener('DOMContentLoaded', (event) => {
     usersDivEl = document.getElementById('users');
     postsDivEl = document.getElementById('posts');
     loadButtonEl = document.getElementById('load-users');
     commentDivEl = document.getElementById('comments');
+    albumDivEl = document.getElementById('albums');
+    loadAlbumsButtonDivel = document.getElementById('load-albums');
     loadAEl = document.getElementById('load-posts')
     loadButtonEl.addEventListener('click', onLoadUsers);
 });
