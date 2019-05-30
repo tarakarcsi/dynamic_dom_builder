@@ -4,8 +4,7 @@ let usersDivEl;
 let postsDivEl;
 let commentDivEl;
 let loadButtonEl;
-let albumDivEl;
-let loadAlbumsButtonDivel;
+let albumsDivEl;
 
 function createUsersTableHeader() {
     const idTdEl = document.createElement('td');
@@ -17,6 +16,9 @@ function createUsersTableHeader() {
     const trEl = document.createElement('tr');
     trEl.appendChild(idTdEl);
     trEl.appendChild(nameTdEl);
+
+    const buttonAlbumsTdEl = document.createElement('td');
+    buttonAlbumsTdEl.textContent = 'Albums';
 
     const theadEl = document.createElement('thead');
     theadEl.appendChild(trEl);
@@ -37,18 +39,31 @@ function createUsersTableBody(users) {
         const dataUserIdAttr = document.createAttribute('data-user-id');
         dataUserIdAttr.value = user.id;
 
+        const dataUserAlbumIdAttr = document.createAttribute('data-user-id');
+        dataUserAlbumIdAttr.value = user.id;
+
         const buttonEl = document.createElement('button');
         buttonEl.textContent = user.name;
         buttonEl.setAttributeNode(dataUserIdAttr);
         buttonEl.addEventListener('click', onLoadPosts);
 
+        const buttonAlbumsEl = document.createElement('button');
+        buttonAlbumsEl.textContent = 'Albums';
+        buttonAlbumsEl.setAttributeNode(dataUserAlbumIdAttr);
+        buttonAlbumsEl.addEventListener('click', onLoadAlbums);
+
         const nameTdEl = document.createElement('td');
         nameTdEl.appendChild(buttonEl);
+
+        const buttonAlbumsTdEl = document.createElement('td');
+        buttonAlbumsTdEl.appendChild(buttonAlbumsEl);
 
         // creating row
         const trEl = document.createElement('tr');
         trEl.appendChild(idTdEl);
         trEl.appendChild(nameTdEl);
+        trEl.appendChild(buttonAlbumsTdEl);
+
 
         tbodyEl.appendChild(trEl);
     }
@@ -180,78 +195,52 @@ function onCommentsReceived() {
     divEl.appendChild(createCommentsList(comments));
 }
 
-function createAlbumsTableHeader() {
-    const idTdEl = document.createElement('td');
-    idTdEl.textContent = 'Id';
-
-    const nameTdEl = document.createElement('td');
-    nameTdEl.textContent = 'Name';
-
-    const trEl = document.createElement('tr');
-    trEl.appendChild(idTdEl);
-    trEl.appendChild(nameTdEl);
-
-    const theadEl = document.createElement('thead');
-    theadEl.appendChild(trEl);
-    return theadEl;
-}
-
-function createAlbumsTableBody(albums) {
-    const tbodyEl = document.createElement('tbody');
-
+function createAlbumsList(albums) {
+    const ulEl = document.createElement('ul');
+  
     for (let i = 0; i < albums.length; i++) {
-        const album = albums[i];
-
-        // creating id cell
-        const idTdEl = document.createElement('td');
-        idTdEl.textContent = album.id;
-
-        // creating name cell
-        const dataAlbumIdAttr = document.createAttribute('data-album-id');
-        dataAlbumIdAttr.value = album.id;
-
-        const buttonEl = document.createElement('button');
-        buttonEl.textContent = album.title;
-        buttonEl.setAttributeNode(dataAlbumIdAttr);
-        buttonEl.addEventListener('click', onLoadAlbums);
-
-        const nameTdEl = document.createElement('td');
-        nameTdEl.appendChild(buttonEl);
-
-        // creating row
-        const trEl = document.createElement('tr');
-        trEl.appendChild(idTdEl);
-        trEl.appendChild(nameTdEl);
-
-        tbodyEl.appendChild(trEl);
+      const album = albums[i];
+  
+      const strongEl = document.createElement('strong');
+      strongEl.textContent = album.title;
+  
+      const pEl = document.createElement('p');
+      pEl.appendChild(strongEl);
+  
+      const albumIdAttr = album.id;
+      strongEl.setAttribute('id', albumIdAttr);
+      strongEl.addEventListener('click', onLoadAlbums);
+  
+      const liEl = document.createElement('li');
+      liEl.appendChild(pEl);
+  
+      ulEl.appendChild(liEl);
     }
+  
+    return ulEl;
+  }
 
-    return tbodyEl;
-}
-
-function createAlbumsTable(albums) {
-    const tableEl = document.createElement('table');
-    tableEl.appendChild(createAlbumsTableHeader());
-    tableEl.appendChild(createAlbumsTableBody(albums));
-    return tableEl;
-}
 
 function onAlbumsReceived() {
-    albumDivEl.style.display = 'block';
-
-    loadButtonEl.remove();
+    postsDivEl.style.display = 'none';
+    albumsDivEl.style.display = 'block';
 
     const text = this.responseText;
     const albums = JSON.parse(text);
 
     const divEl = document.getElementById('albums-content');
-    divEl.appendChild(createAlbumsTable(albums));
+    while (divEl.firstChild) {
+        divEl.removeChild(divEl.firstChild);
+    }
+    divEl.appendChild(createAlbumsList(albums));
 }
 
 function onLoadAlbums() {
+    const el = this;
+    const userId = el.getAttribute('data-user-id');
     const xhr = new XMLHttpRequest();
     xhr.addEventListener('load', onAlbumsReceived);
-    xhr.open('GET', BASE_URL + '/albums');
+    xhr.open('GET', BASE_URL + '/albums?userId=' + userId);
     xhr.send();
 }
 
@@ -260,8 +249,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
     postsDivEl = document.getElementById('posts');
     loadButtonEl = document.getElementById('load-users');
     commentDivEl = document.getElementById('comments');
-    albumDivEl = document.getElementById('albums');
-    loadAlbumsButtonDivel = document.getElementById('load-albums');
-    loadAEl = document.getElementById('load-posts')
+    albumsDivEl = document.getElementById('albums');
     loadButtonEl.addEventListener('click', onLoadUsers);
 });
